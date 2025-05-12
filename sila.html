@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To My Dearest Sila</title>
+    <style>
+        :root {
+            --pink: #ff80c0;
+            --soft-pink: #ffe6f2;
+            --mint: #a6e3ce;
+            --purple: #9370db;
+            --dark-purple: #3a2a4d;
+            --light-blue: #a0d6e7;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--soft-pink);
+            color: var(--dark-purple);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        .welcome-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--soft-pink);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 1s;
+        }
+        
+        .enter-button {
+            margin-top: 20px;
+            padding: 12px 24px;
+            background-color: var(--pink);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: transform 0.3s, background-color 0.3s;
+        }
+        
+        .enter-button:hover {
+            transform: scale(1.05);
+            background-color: #ff60b0;
+        }
+        
+        .music-recommendation {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 10px 15px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .music-icon {
+            font-size: 1.5rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .game-container {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem auto;
+            text-align: center;
+            max-width: 600px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+        
+        .game-title {
+            color: var(--pink);
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+        }
+        
+        .heart-game {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            margin: 2rem 0;
+            overflow: hidden;
+            border-radius: 8px;
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+        
+        .player-heart {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            background-color: var(--pink);
+            border-radius: 50% 50% 0 0;
+            transform: rotate(45deg) translateX(-50%);
+            z-index: 10;
+            cursor: pointer;
+        }
+        
+        .player-heart::before,
+        .player-heart::after {
+            content: "";
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-color: var(--pink);
+            border-radius: 50%;
+        }
+        
+        .player-heart::before {
+            top: -20px;
+            left: 0;
+        }
+        
+        .player-heart::after {
+            top: 0;
+            left: -20px;
+        }
+        
+        .falling-heart {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: var(--pink);
+            transform: rotate(45deg);
+            animation: fall 3s linear forwards;
+        }
+        
+        .falling-heart::before,
+        .falling-heart::after {
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: var(--pink);
+            border-radius: 50%;
+        }
+        
+        .falling-heart::before {
+            top: -10px;
+            left: 0;
+        }
+        
+        .falling-heart::after {
+            top: 0;
+            left: -10px;
+        }
+        
+        @keyframes fall {
+            0% {
+                top: -20px;
+            }
+            100% {
+                top: 320px;
+            }
+        }
+        
+        .game-instructions {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        
+        .game-score {
+            font-size: 1.2rem;
+            color: var(--pink);
+            margin-bottom: 1rem;
+        }
+        
+        .reveal-letter-btn {
+            padding: 12px 24px;
+            background-color: var(--mint);
+            color: var(--dark-purple);
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.3s, opacity 0.3s;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        
+        .reveal-letter-btn.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        .reveal-letter-btn.active:hover {
+            transform: scale(1.05);
+        }
+        
+        .letter-container {
+            display: none;
+            max-width: 800px;
+            margin: 2rem auto;
+            background-color: white;
+            padding: 3rem;
+            border-radius: 16px;
+            color: var(--dark-purple);
+            position: relative;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .letter-container::before {
+            content: "";
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            width: 80px;
+            height: 80px;
+            background-color: var(--pink);
+            transform: rotate(45deg);
+            opacity: 0.6;
+        }
+        
+        .letter-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--pink);
+            font-size: 2rem;
+        }
+        
+        .letter-image-description {
+            display: block;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            background-color: var(--dark-purple);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .letter-content {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+        
+        .letter-signature {
+            text-align: right;
+            font-size: 1.4rem;
+            font-style: italic;
+            color: var(--pink);
+        }
+        
+        .hearts-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .floating-heart {
+            position: absolute;
+            background-color: var(--pink);
+            opacity: 0.5;
+            transform: rotate(45deg);
+        }
+        
+        .floating-heart::before,
+        .floating-heart::after {
+            content: "";
+            position: absolute;
+            background-color: var(--pink);
+            border-radius: 50%;
+        }
+        
+        .floating-heart::before {
+            top: -50%;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .floating-heart::after {
+            top: 0;
+            left: -50%;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .floating-flower {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--mint) 0%, var(--light-blue) 100%);
+        }
+        
+        .floating-flower::after {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            border-radius: 50%;
+            top: 0;
+            left: 0;
+            transform: scale(0.5);
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(45deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(45deg);
+            }
+        }
+        
+        @keyframes floatFlower {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-15px) rotate(10deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-screen">
+        <h1 style="font-size: 2.5rem; color: var(--pink); text-align: center; margin-bottom: 1rem;">To My Dearest Sila</h1>
+        <p style="font-size: 1.2rem; margin-bottom: 1rem;">A special message just for you...</p>
+        <button class="enter-button" id="enterBtn">Enter</button>
+    </div>
+    
+    <div class="music-recommendation">
+        <div class="music-icon">🎵</div>
+        <div>Recommended: "Spiracle" by Flower Face</div>
+    </div>
+    
+    <div class="hearts-bg" id="heartsBackground"></div>
+    
+    <div class="container">
+        <div class="game-container">
+            <h2 class="game-title">Catch The Hearts</h2>
+            <p class="game-instructions">Use your arrow keys to move and catch 10 hearts to unlock the letter!</p>
+            <div class="game-score">Hearts: <span id="heartCount">0</span>/10</div>
+            <div class="heart-game" id="heartGame">
+                <div class="player-heart" id="playerHeart"></div>
+            </div>
+            <button class="reveal-letter-btn" id="revealLetterBtn">Read Letter</button>
+        </div>
+        
+        <div class="letter-container" id="letterContainer">
+            <h1 class="letter-header">To My Dearest Sila</h1>
+            
+            <div class="letter-content">
+                <p>My dearest Sila,</p>
+                <br>
+                <p>I was thinking about you the whole time. I was thinking about every single moment we spent together, and I just realized I never showed my soul to someone, I never been known. Till I met you.</p>
+                <br>
+                <p>I just want you to know that you are so precious to me. Even if you are not here at the moment, you've been in my head 24/7. I sleep on the thought of you, I ask myself if you are fine, if you are healthy, if your exams were fine. You are always with me, I carry you in my mind and heart.</p>
+                <br>
+                <p>I trust you with my life and death and I'll keep trusting you forever. I'm more than grateful to have you, and the most important thing is that I love you the most.</p>
+                <br>
+                <p>I want you to know that no matter what happens, my door will always be expecting you to knock on it. You will be always welcome and loved by me, and I'll be so ready to give out my heart if it means that it will make you happy.</p>
+                <br>
+                <p>Like the characters in the image, I imagine us together, sharing quiet moments, finding comfort in each other's presence. Our own little world where we can just be.</p>
+                <br>
+                <p>Every single day, you make me feel like I'm the luckiest person. Your kindness, your smile, your voice - everything about you brings so much joy to my life.</p>
+            </div>
+            <div class="letter-signature">
+                With all my love,<br>
+                Anne
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize background decorations
+        function createBackgroundElements() {
+            const background = document.getElementById('heartsBackground');
+            
+            // Create floating hearts
+            for (let i = 0; i < 15; i++) {
+                const heart = document.createElement('div');
+                heart.classList.add('floating-heart');
+                
+                const size = Math.random() * 20 + 10;
+                heart.style.width = `${size}px`;
+                heart.style.height = `${size}px`;
+                
+                const left = Math.random() * 100;
+                const top = Math.random() * 100;
+                heart.style.left = `${left}%`;
+                heart.style.top = `${top}%`;
+                
+                heart.style.opacity = Math.random() * 0.3 + 0.1;
+                
+                const duration = Math.random() * 10 + 10;
+                heart.style.animation = `float ${duration}s ease-in-out infinite`;
+                heart.style.animationDelay = `${Math.random() * 10}s`;
+                
+                background.appendChild(heart);
+            }
+            
+            // Create floating flowers
+            for (let i = 0; i < 10; i++) {
+                const flower = document.createElement('div');
+                flower.classList.add('floating-flower');
+                
+                const size = Math.random() * 30 + 20;
+                flower.style.width = `${size}px`;
+                flower.style.height = `${size}px`;
+                
+                const left = Math.random() * 100;
+                const top = Math.random() * 100;
+                flower.style.left = `${left}%`;
+                flower.style.top = `${top}%`;
+                
+                flower.style.opacity = Math.random() * 0.4 + 0.1;
+                
+                const duration = Math.random() * 8 + 8;
+                flower.style.animation = `floatFlower ${duration}s ease-in-out infinite`;
+                flower.style.animationDelay = `${Math.random() * 8}s`;
+                
+                background.appendChild(flower);
+            }
+        }
+        
+        // Heart catching game
+        function initHeartGame() {
+            const gameArea = document.getElementById('heartGame');
+            const playerHeart = document.getElementById('playerHeart');
+            const heartCountElement = document.getElementById('heartCount');
+            const revealLetterBtn = document.getElementById('revealLetterBtn');
+            
+            let playerX = gameArea.offsetWidth / 2 - 20;
+            let heartCount = 0;
+            let gameActive = true;
+            
+            // Set initial player position
+            playerHeart.style.left = `${playerX}px`;
+            
+            // Key controls
+            document.addEventListener('keydown', (e) => {
+                if (!gameActive) return;
+                
+                const gameWidth = gameArea.offsetWidth;
+                const playerWidth = 40;
+                
+                if (e.key === 'ArrowLeft') {
+                    playerX = Math.max(0, playerX - 15);
+                } else if (e.key === 'ArrowRight') {
+                    playerX = Math.min(gameWidth - playerWidth, playerX + 15);
+                }
+                
+                playerHeart.style.left = `${playerX}px`;
+            });
+            
+            // Click/touch controls for mobile
+            gameArea.addEventListener('click', (e) => {
+                if (!gameActive) return;
+                
+                const rect = gameArea.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                
+                playerX = clickX - 20;
+                const gameWidth = gameArea.offsetWidth;
+                const playerWidth = 40;
+                
+                playerX = Math.max(0, Math.min(gameWidth - playerWidth, playerX));
+                playerHeart.style.left = `${playerX}px`;
+            });
+            
+            // Create falling hearts
+            function createFallingHeart() {
+                if (!gameActive) return;
+                
+                const heart = document.createElement('div');
+                heart.classList.add('falling-heart');
+                
+                const gameWidth = gameArea.offsetWidth;
+                const heartX = Math.random() * (gameWidth - 20);
+                
+                heart.style.left = `${heartX}px`;
+                gameArea.appendChild(heart);
+                
+                // Check collision
+                const collisionCheck = setInterval(() => {
+                    const heartRect = heart.getBoundingClientRect();
+                    const playerRect = playerHeart.getBoundingClientRect();
+                    
+                    // Adjust the collision detection to be more forgiving
+                    if (
+                        heartRect.bottom > playerRect.top &&
+                        heartRect.right > playerRect.left &&
+                        heartRect.left < playerRect.right
+                    ) {
+                        clearInterval(collisionCheck);
+                        heart.remove();
+                        heartCount++;
+                        heartCountElement.textContent = heartCount;
+                        
+                        // Check if all hearts are collected
+                        if (heartCount >= 10) {
+                            gameActive = false;
+                            revealLetterBtn.classList.add('active');
+                        }
+                    }
+                }, 100);
+                
+                // Remove heart after animation ends
+                setTimeout(() => {
+                    heart.remove();
+                    clearInterval(collisionCheck);
+                }, 3000);
+            }
+            
+            // Start creating hearts
+            const heartInterval = setInterval(() => {
+                if (!gameActive) {
+                    clearInterval(heartInterval);
+                    return;
+                }
+                createFallingHeart();
+            }, 800);
+        }
+        
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            createBackgroundElements();
+            
+            const enterBtn = document.getElementById('enterBtn');
+            const welcomeScreen = document.querySelector('.welcome-screen');
+            
+            enterBtn.addEventListener('click', () => {
+                welcomeScreen.style.opacity = 0;
+                setTimeout(() => {
+                    welcomeScreen.style.display = 'none';
+                    initHeartGame();
+                }, 1000);
+            });
+            
+            const revealLetterBtn = document.getElementById('revealLetterBtn');
+            const letterContainer = document.getElementById('letterContainer');
+            
+            revealLetterBtn.addEventListener('click', () => {
+                if (revealLetterBtn.classList.contains('active')) {
+                    letterContainer.style.display = 'block';
+                    revealLetterBtn.textContent = 'Letter Revealed';
+                    revealLetterBtn.disabled = true;
+                    
+                    // Scroll to the letter
+                    setTimeout(() => {
+                        letterContainer.scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
